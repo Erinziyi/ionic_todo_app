@@ -1,40 +1,24 @@
-import { Component } from "@angular/core";
+import { Component, OnInit } from "@angular/core";
 import { ModalController } from "@ionic/angular";
 import { AddPage } from "../add/add.page";
+import { DataService } from "../data.service";
 
 @Component({
   selector: "app-home",
   templateUrl: "home.page.html",
   styleUrls: ["home.page.scss"]
 })
-export class HomePage {
-  todos = [
-    {
-      id: 1,
-      name: "Buy Milk Tea",
-      place: "Family Mart",
-      description: "Buy 2 Milk Tea for me",
-      completed: true
-    },
+export class HomePage implements OnInit {
+  todos = [];
 
-    {
-      id: 2,
-      name: "Watch Spiderman",
-      place: "Gsc MidValley",
-      description: "Alone. Erin bojio",
-      completed: false
-    },
+  constructor(
+    public modalController: ModalController,
+    public dataService: DataService
+  ) {}
 
-    {
-      id: 3,
-      name: "Book Hotel",
-      place: "Traveloka",
-      description: "Book hotel for Penang",
-      completed: false
-    }
-  ];
-
-  constructor(public modalController: ModalController) {}
+  ngOnInit() {
+    this.todos = this.dataService.getAllItems();
+  }
 
   async presentModal() {
     const modal = await this.modalController.create({
@@ -44,6 +28,16 @@ export class HomePage {
     modal.present();
     const { data } = await modal.onWillDismiss();
     console.log(data);
+    // How to generate a unique
+    this.dataService.addItem(data);
     this.todos.push(data.newtodo);
+  }
+
+  markDone(todo) {
+    todo.completed = true;
+  }
+
+  delete(i) {
+    this.todos.splice(i, 1);
   }
 }
